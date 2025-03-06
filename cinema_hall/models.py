@@ -1,4 +1,5 @@
 import uuid
+from movies.models import Movie
 from django.db import models
 from django.core.validators import MaxLengthValidator, MinValueValidator
 
@@ -9,6 +10,7 @@ class Hall(models.Model):
     hall_name = models.CharField(max_length=250)
     hall_address = models.CharField(max_length=250)
     hall_city = models.CharField(max_length=250)
+    # movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.hall_name

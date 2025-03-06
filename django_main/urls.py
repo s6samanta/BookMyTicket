@@ -22,5 +22,5 @@ urlpatterns = [
     path('', include('cinema_hall.urls')),
     path('', include('movies.urls')),
     path('', include('users.urls')),
-    # path('', include('tickets.urls')),
+    path('', include('tickets.urls')),
 ]
