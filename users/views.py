@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from .models import User
 from cities.models import City
 from .validators import Validate
+from .utils import UserOperations
 
 
 class Signup(APIView):
@@ -26,17 +27,29 @@ class Signup(APIView):
         try:
             city_instance = City.objects.get(city_id=city_id)
         except:
-            return Response({'message':'enter valid city', 'status':False}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'enter valid city', 'status': False}, status=status.HTTP_400_BAD_REQUEST)
         
         data["own_city"] = city_instance
+        password = bcrypt.hashpw(data.get('password').encode(), salt=bcrypt.gensalt())
+        data["password"] = password
+
         try:
             User.objects.create(**data)
         except IntegrityError as e:
             return Response({'message':'user already exists', 'status': False}, status=status.HTTP_400_BAD_REQUEST)
-        
-        password = bcrypt.hashpw(data.get('password').encode(), salt=bcrypt.gensalt())
-        data["password"] = password
         return Response(
             {"message": "User created successfully"}, status=status.HTTP_201_CREATED
         )
-    
+
+
+class Login(APIView):
+    def post(self, request):
+        payload = request.data   
+        if not payload.get('email') or payload.get('email').strip() == '':
+            return Response({'message': 'email is missing', 'status': False}, status=status.HTTP_400_BAD_REQUEST)
+        if not payload.get('password') or payload.get('password').strip() == '':
+            return Response({'message': 'password is missing', 'status': False}, status=status.HTTP_400_BAD_REQUEST)
+
+        response = UserOperations.login_operations(payload.get('email'),
+                                                   payload.get('password'))
+        return response
